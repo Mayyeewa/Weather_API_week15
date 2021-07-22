@@ -17,7 +17,7 @@ class App extends React.Component {
       country: undefined,
       icon: undefined,
       main: undefined,
-      celsius: undefined,
+      fahrenheit: undefined,
       temp_max: undefined,
       temp_min: undefined,
       description:"",
@@ -25,7 +25,7 @@ class App extends React.Component {
     };
 
     this.weatherIcon={
-      Thunderstrom:"wi-thunderstrom",
+      Thunderstrom:"wi-thunderstorm",
       Drizzle:"wi-sleet",
       Rain:"wi-strom-showers",
       Atmosphere:"wi-fog",
@@ -35,15 +35,15 @@ class App extends React.Component {
     }
   }
 
-calCelsius(temp){
-    let cell = Math.floor(temp-273.15);
+  calFahrenheit(temp){
+    let cell = (Math.round(temp*1.8-459.67));
       return cell;
 }
 
-get_WeatherIcon(icons, rangeId){
+getWeatherIcon(icons, rangeId){
   switch(true){
     case rangeId>=200&& rangeId <=232:
-      this.setState({icon:this.weatherIcon.Thunderstrom});
+      this.setState({icon:this.weatherIcon.Thunderstorm});
         break;
     case rangeId>=300&& rangeId <=321:
       this.setState({icon:this.weatherIcon.Drizzle});
@@ -75,7 +75,7 @@ getWeather = async(e)=>{
   const city = e.target.elements.city.value;
   const country = e.target.elements.country.value;
 
-if ((city!=null) && (country !=null)) {
+if (city && country) {
   const api_call = await fetch(
     `http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_key}`
     );
@@ -86,17 +86,17 @@ if ((city!=null) && (country !=null)) {
 
     this.setState({
         city: `${response.name},${response.sys.country}`,
-        celsius: this.calCelsius(response.main.temp),
-        temp_max: this.calCelsius(response.main.temp_max),
-        temp_min: this.calCelsius(response.main.temp_min),
+        fahrenheit: this.calFahrenheit(response.main.temp),
+        temp_max: this.calFahrenheit(response.main.temp_max),
+        temp_min: this.calFahrenheit(response.main.temp_min),
         description: response.weather[0].description,
-        error: false 
+        
     });
 
-    this.get_WeatherIcon(this.weatherIcon,response.weather[0].id);
+    this.getWeatherIcon(this.weatherIcon,response.weather[0].id);
 }else{
   this.setState({error : true});
-}
+  }
   
 };
 
@@ -108,7 +108,7 @@ if ((city!=null) && (country !=null)) {
         <Weather 
               city={this.state.city} 
               country={this.state.country} 
-              temp_celsius={this.state.celsius}
+              temp_fahrenheit={this.state.fahrenheit}
               temp_max={this.state.temp_max}
               temp_min={this.state.temp_min}
               description={this.state.description} 
